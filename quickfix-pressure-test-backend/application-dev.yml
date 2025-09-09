@@ -1,0 +1,53 @@
+# application-dev.yml - 开发环境配置
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/quickfix_pressure_test?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+  
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: always
+
+# QuickFIX/J配置
+quickfix:
+  config:
+    path: classpath:quickfix/
+    session-config: fix-client.cfg
+
+# 外部服务配置
+influxdb:
+  url: http://localhost:8086
+  token: dev-token
+  org: quickfix-test
+  bucket: metrics
+  enabled: false
+
+elasticsearch:
+  hosts: localhost:9200
+  username: elastic
+  password: changeme
+  enabled: false
+
+# 日志配置
+logging:
+  level:
+    com.fix.test: DEBUG
+    quickfix: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
