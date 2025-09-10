@@ -1,0 +1,12 @@
+{
+  "msgRate": 1000,
+  "duration": 300,
+  "host": "fix-engine-prod.edmz.example.com",
+  "port": 9815,
+  "senderId": "CLIENT_TEST",
+  "targetId": "FIX_ENGINE",
+  "msgSize": 500,
+  "newOrderRatio": 70,
+  "orderCancelRatio": 20,
+  "statusRequestRatio": 10
+}
