@@ -1,0 +1,25 @@
+# FIX客户端配置模板
+[DEFAULT]
+ConnectionType=initiator
+ReconnectInterval=5
+FileLogPath=logs/
+StartTime=00:00:00
+EndTime=23:59:59
+HeartBtInt=30
+ValidateUserDefinedFields=N
+UseDataDictionary=Y
+DataDictionary=FIX44.xml
+
+# GCP EDMZ环境配置
+SocketConnectHost=fix-engine-internal-ip  # GCP内部IP地址
+SocketConnectPort=1234                  # FIX引擎端口
+SocketUseSSL=Y                          # 启用SSL/TLS加密
+SSLCertificateFile=client-cert.pem      # 客户端证书
+SSLPrivateKeyFile=client-key.pem        # 客户端私钥
+SSLTrustStore=truststore.jks            # 信任库
+
+[SESSION]
+BeginString=FIX.4.4
+SenderCompID=TEST_CLIENT                # 会被自动添加会话ID后缀
+TargetCompID=FIX_ENGINE
+    
