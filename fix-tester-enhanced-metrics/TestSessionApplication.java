@@ -80,9 +80,16 @@ public class TestSessionApplication implements Application {
     @Override
     public void onLogon(SessionID sessionId) {
         System.out.println("Session " + this.sessionId + " logged on successfully");
-        isLoggedOn.set(true);
-        logonLatch.countDown();
-        connectionEstablishedCallback.run();
+        // 检查是否是重连（之前已经登录过）
+        if (isLoggedOn.get()) {
+            System.out.println("Session " + this.sessionId + " reconnected");
+            reconnectionCallback.run();
+        } else {
+            // 首次连接
+            isLoggedOn.set(true);
+            logonLatch.countDown();
+            connectionEstablishedCallback.run();
+        }
     }
 
     @Override
@@ -99,8 +106,8 @@ public class TestSessionApplication implements Application {
     @Override
     public void fromAdmin(Message message, SessionID sessionId) throws FieldNotFound, IncorrectDataFormat, IncorrectTagValue, RejectLogon {
         // 处理收到的管理消息
-        if (message instanceof Heartbeat) {
-            try {
+        try {
+            if (message instanceof Heartbeat) {
                 Heartbeat heartbeat = (Heartbeat) message;
                 TestReqID testReqID = heartbeat.getTestReqID();
                 String reqId = testReqID.getValue();
@@ -111,10 +118,24 @@ public class TestSessionApplication implements Application {
                     long responseTime = System.currentTimeMillis() - sendTime;
                     responseCallback.call(responseTime);
                 }
-            } catch (FieldNotFound e) {
-                // 没有TestReqID的心跳消息，忽略
             }
+        } catch (FieldNotFound e) {
+            // 没有TestReqID的心跳消息，忽略
+        } catch (Exception e) {
+            // 处理其他可能的异常
+            System.err.println("Error processing admin message for session " + this.sessionId + ": " + e.getMessage());
         }
+    }
+
+    // 添加一个方法来处理连接失败场景
+    public void notifyConnectionFailure(String reason) {
+        System.err.println("Session " + this.sessionId + " connection failed: " + reason);
+        connectionFailedCallback.call(reason);
+    }
+
+    // 添加一个方法来检查连接状态并在需要时通知
+    public boolean isConnected() {
+        return isLoggedOn.get();
     }
 
     @Override
